@@ -1,49 +1,47 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './entities/users.entity';
 
 @Injectable()
 export class UsersService {
-  private users: Users[] = [
-    {
-      id: 1,
-      ad: 'can',
-      soyad: 'deve',
-      mail: 'devecann@gmail.com',
-      telefon: '5368259986',
-      parola: 'parola123',
-      okul: 'Süleyman Demirel Üniversitesi',
-      bolum: 'Bilgisayar Mühendisliği',
-      sehir: 'ISPARTA',
-      cv: './documents/cv.pdf',
-    },
-  ];
+  constructor(
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
+  ) {}
 
   findAll() {
-    return this.users;
+    return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    const user = this.users.find((item) => item.id === +id);
+  async findOne(id: number) {
+    const user = await this.usersRepository.findOne(id);
     if (!user) {
       throw new NotFoundException(`User ${id} not found`);
     }
     return user;
   }
 
-  create(createUserDTO: any) {
-    this.users.push(createUserDTO);
+  create(createUserDTO: CreateUserDto) {
+    const user = this.usersRepository.create(createUserDTO);
+    return this.usersRepository.save(user);
   }
 
-  update(id: number, updateUserDTO: any) {
-    const existingUser = this.findOne(id);
-    if (existingUser) {
+  async update(id: number, updateUserDTO: UpdateUserDto) {
+    const user = await this.usersRepository.preload({
+      id: +id,
+      ...updateUserDTO,
+    });
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found dude`);
     }
+    return this.usersRepository.save(user);
   }
 
-  remove(id: number) {
-    const userIndex = this.users.findIndex((item) => item.id === +id);
-    if (userIndex >= 0) {
-      this.users.splice(userIndex, 1);
-    }
+  async remove(id: number) {
+    const user = await this.findOne(id);
+    return this.usersRepository.remove(user);
   }
 }
