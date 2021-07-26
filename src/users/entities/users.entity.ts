@@ -4,28 +4,28 @@ import { Document } from 'mongoose';
 @Schema()
 export class Users extends Document {
   @Prop()
-  ad: string;
+  name: string;
 
   @Prop()
-  soyad: string;
+  surname: string;
 
   @Prop()
-  mail: string;
+  email: string;
 
   @Prop()
-  parola: string;
+  password: string;
 
   @Prop()
-  telefon: string;
+  phone: string;
 
   @Prop()
-  okul: string;
+  university: string;
 
   @Prop()
-  bolum: string;
+  degree: string;
 
   @Prop()
-  sehir: string;
+  city: string;
 
   @Prop()
   cv: string;
