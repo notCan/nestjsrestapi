@@ -1,49 +1,46 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from './entities/users.entity';
 
 @Injectable()
 export class UsersService {
-  private users: Users[] = [
-    {
-      id: 1,
-      ad: 'can',
-      soyad: 'deve',
-      mail: 'devecann@gmail.com',
-      telefon: '5368259986',
-      parola: 'parola123',
-      okul: 'Süleyman Demirel Üniversitesi',
-      bolum: 'Bilgisayar Mühendisliği',
-      sehir: 'ISPARTA',
-      cv: './documents/cv.pdf',
-    },
-  ];
+  constructor(
+    @InjectModel(Users.name) private readonly usersModel: Model<Users>,
+  ) {}
 
   findAll() {
-    return this.users;
+    return this.usersModel.find().exec();
   }
 
-  findOne(id: number) {
-    const user = this.users.find((item) => item.id === +id);
+  async findOne(id: string) {
+    const user = await this.usersModel.find({ _id: id }).exec();
     if (!user) {
       throw new NotFoundException(`User ${id} not found`);
     }
     return user;
   }
 
-  create(createUserDTO: any) {
-    this.users.push(createUserDTO);
+  create(createUserDTO: CreateUserDto) {
+    const user = new this.usersModel(createUserDTO);
+    return user.save();
   }
 
-  update(id: number, updateUserDTO: any) {
-    const existingUser = this.findOne(id);
-    if (existingUser) {
+  async update(id: string, updateUserDTO: UpdateUserDto) {
+    const existingUser = await this.usersModel
+      .findOneAndUpdate({ _id: id }, { $set: updateUserDTO }, { new: true })
+      .exec();
+
+    if (!existingUser) {
+      throw new NotFoundException(`user ${id} not found dude`);
     }
+    return existingUser;
   }
 
-  remove(id: number) {
-    const userIndex = this.users.findIndex((item) => item.id === +id);
-    if (userIndex >= 0) {
-      this.users.splice(userIndex, 1);
-    }
+  async remove(id: string) {
+    const user: any = await this.findOne(id);
+    return user.remove();
   }
 }
