@@ -43,13 +43,8 @@ export class UsersService {
     try {
       const user = await this.usersModel.findOne({ _id: id });
       return user.deleteOne();
-      // return this.usersModel.deleteOne({ _id: id });
     } catch (error) {
       throw new NotFoundException(`User ${id} cant delete cause there is none`);
     }
   }
-  // async remove(id: string) {
-  //   const user: any = await this.findOne(id);
-  //   return user.deleteOne();
-  // }
 }
