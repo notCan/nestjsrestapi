@@ -29,6 +29,9 @@ export class Users extends Document {
 
   @Prop()
   cv: string;
+
+  @Prop()
+  isActive: boolean;
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);

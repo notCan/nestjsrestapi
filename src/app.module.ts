@@ -4,9 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import environment from './env/environment';
 import { UsersModule } from './users/users.module';
+import { CompanyModule } from './company/company.module';
 
 @Module({
-  imports: [UsersModule, MongooseModule.forRoot(environment.mongoUrl)],
+  imports: [UsersModule, MongooseModule.forRoot(environment.mongoUrl), CompanyModule],
   controllers: [AppController],
   providers: [AppService],
 })
